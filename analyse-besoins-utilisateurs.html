@@ -3,979 +3,561 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analyse des Besoins Utilisateurs — Architecture de l'Information</title>
+<title>Analyse des besoins utilisateurs — Architecture de l'information</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --accent: #c8f04d;
-    --accent2: #4dffc3;
-    --accent3: #ff6b4a;
-    --text: #e8e8f0;
-    --muted: #6e6e8a;
-    --border: #2a2a3a;
-    --step1: #c8f04d;
-    --step2: #4dffc3;
-    --step3: #a78bfa;
-    --step4: #fb923c;
-    --step5: #f472b6;
-    --step6: #38bdf8;
-  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --c-bg: #FAFAF8;
+    --c-surface: #FFFFFF;
+    --c-border: #E4E2DA;
+    --c-border-strong: #C8C5BB;
+    --c-text: #1A1917;
+    --c-text-muted: #6B6860;
+    --c-text-faint: #9A9890;
+    --c-accent: #2A2724;
+    --c-accent-light: #F0EEE8;
+    --c-success: #2D6A4F;
+    --c-success-bg: #EAF5F0;
+    --font-display: 'Lora', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 6px;
+    --radius-lg: 10px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  }
 
   html { scroll-behavior: smooth; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    line-height: 1.7;
-    overflow-x: hidden;
-  }
-
-  /* NOISE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.3;
-  }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 80px 60px;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .hero::after {
-    content: '';
-    position: absolute;
-    top: -200px;
-    right: -200px;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(200,240,77,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .hero-label {
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .hero-label::before {
-    content: '';
-    display: inline-block;
-    width: 32px;
-    height: 1px;
-    background: var(--accent);
-  }
-
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(42px, 8vw, 96px);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin-bottom: 32px;
-  }
-
-  h1 span {
-    color: var(--accent);
-    display: block;
-  }
-
-  .hero-desc {
-    max-width: 520px;
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.8;
-    margin-bottom: 48px;
-  }
-
-  .hero-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .tag {
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    transition: all 0.2s;
-  }
-
-  .tag:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: 40px;
-    left: 60px;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-
-  .scroll-hint::after {
-    content: '';
-    display: block;
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, var(--muted), transparent);
-    animation: extend 2s ease-in-out infinite;
-  }
-
-  @keyframes extend {
-    0%, 100% { transform: scaleY(0.6); }
-    50% { transform: scaleY(1); }
-  }
-
-  /* NAV */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10,10,15,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 60px;
-    display: flex;
-    gap: 0;
-  }
-
-  nav a {
-    padding: 18px 0;
-    margin-right: 32px;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-  }
-
-  nav a:hover, nav a.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-
-  /* SECTIONS */
-  section {
-    padding: 100px 60px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
-  .section-num {
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .section-num::before {
-    content: '';
-    display: inline-block;
-    width: 24px;
-    height: 1px;
-    background: var(--muted);
-  }
-
-  h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(28px, 4vw, 48px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 48px;
-    line-height: 1.1;
-  }
-
-  /* OBJECTIFS */
-  .goals-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-bottom: 60px;
-  }
-
-  .goal-item {
-    background: var(--surface);
-    padding: 32px;
-    transition: background 0.2s;
-  }
-
-  .goal-item:hover { background: var(--surface2); }
-
-  .goal-icon {
-    font-size: 24px;
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .goal-item h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--accent);
-  }
-
-  .goal-item p {
-    font-size: 12px;
-    color: var(--muted);
+    font-family: var(--font-body);
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-size: 15px;
     line-height: 1.6;
+    min-height: 100vh;
   }
 
-  /* TOOLS GRID */
-  .tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--c-border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 15px; color: var(--c-text); text-decoration: none; letter-spacing: -0.01em; }
+  .nav-brand span { color: var(--c-text-muted); font-weight: 400; font-style: italic; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--c-text-muted); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--c-text); }
+  .nav-badge { font-size: 11px; background: var(--c-accent); color: #fff; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 780px; margin: 0 auto;
+    padding: 5rem 2rem 4rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-text-muted); margin-bottom: 1.25rem;
+  }
+  .hero-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: var(--c-border-strong); }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: 2.4rem; font-weight: 500; line-height: 1.2;
+    letter-spacing: -0.02em; color: var(--c-text);
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--c-text-muted); }
+  .hero-desc { font-size: 15px; color: var(--c-text-muted); line-height: 1.7; margin-bottom: 1.75rem; }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--c-accent); color: #fff;
+    padding: 11px 22px; border-radius: var(--radius); font-size: 14px; font-weight: 500;
+    text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    border: none; cursor: pointer;
+  }
+  .hero-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+  .hero-cta svg { width: 14px; height: 14px; }
+  .hero-aside { display: flex; flex-direction: column; gap: 10px; }
+  .stat-card {
+    background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg); padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    animation: fadeUp 0.5s ease both;
+  }
+  .stat-card:nth-child(1) { animation-delay: 0.1s; }
+  .stat-card:nth-child(2) { animation-delay: 0.2s; }
+  .stat-card:nth-child(3) { animation-delay: 0.3s; }
+  .stat-card-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 500; color: var(--c-text); line-height: 1; }
+  .stat-card-label { font-size: 12px; color: var(--c-text-muted); margin-top: 3px; }
+
+  /* ── METHODOLOGY ── */
+  .section { max-width: 780px; margin: 0 auto; padding: 3rem 2rem; }
+  .section-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+  .section-sub { font-size: 14px; color: var(--c-text-muted); margin-bottom: 2rem; }
+
+  .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .method-card {
+    background: var(--c-surface); border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg); padding: 1.25rem;
+    box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+  }
+  .method-card::before {
+    content: attr(data-num);
+    position: absolute; top: -10px; right: 10px;
+    font-family: var(--font-display); font-size: 4rem; font-weight: 500;
+    color: var(--c-border); line-height: 1; pointer-events: none;
+  }
+  .method-icon { font-size: 1.25rem; margin-bottom: 0.75rem; }
+  .method-title { font-size: 13px; font-weight: 500; margin-bottom: 0.4rem; }
+  .method-desc { font-size: 12px; color: var(--c-text-muted); line-height: 1.5; }
+
+  /* ── QUESTIONNAIRE ── */
+  #questionnaire { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden; }
+
+  .q-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--c-border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .q-section-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-muted); }
+  .q-step-indicator { font-size: 12px; color: var(--c-text-faint); }
+
+  .progress-track { height: 2px; background: var(--c-border); }
+  .progress-fill { height: 100%; background: var(--c-accent); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+  .q-body { padding: 2rem; min-height: 340px; }
+  .q-block { display: none; animation: fadeUp 0.3s ease; }
+  .q-block.active { display: block; }
+
+  .q-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 500; margin-bottom: 0.4rem; line-height: 1.3; }
+  .q-hint { font-size: 13px; color: var(--c-text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-btn {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--c-border); border-radius: var(--radius);
+    background: var(--c-bg); cursor: pointer; text-align: left; width: 100%;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+  .opt-btn:hover { border-color: var(--c-border-strong); background: var(--c-surface); box-shadow: var(--shadow-sm); }
+  .opt-btn.selected { border-color: var(--c-accent); background: var(--c-surface); }
+  .opt-btn.selected .opt-radio { background: var(--c-accent); border-color: var(--c-accent); }
+  .opt-btn.selected .opt-radio::after { opacity: 1; }
+  .opt-radio {
+    width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--c-border-strong);
+    flex-shrink: 0; margin-top: 2px; position: relative; transition: all 0.15s;
+  }
+  .opt-radio::after {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 6px; height: 6px; border-radius: 50%; background: #fff; opacity: 0;
+  }
+  .opt-label { font-size: 14px; font-weight: 500; color: var(--c-text); margin-bottom: 2px; }
+  .opt-desc { font-size: 12px; color: var(--c-text-muted); line-height: 1.4; }
+
+  .q-textarea {
+    width: 100%; border: 1px solid var(--c-border); border-radius: var(--radius);
+    padding: 12px; font-size: 14px; font-family: var(--font-body);
+    color: var(--c-text); background: var(--c-bg); resize: vertical; min-height: 100px;
+    line-height: 1.6; transition: border-color 0.15s;
+  }
+  .q-textarea:focus { outline: none; border-color: var(--c-accent); background: var(--c-surface); }
+  .q-textarea::placeholder { color: var(--c-text-faint); }
+
+  .q-footer {
+    padding: 1.25rem 2rem; border-top: 1px solid var(--c-border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .btn { padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-text); font-family: var(--font-body); }
+  .btn:hover { background: var(--c-accent-light); border-color: var(--c-border-strong); }
+  .btn-primary { background: var(--c-accent); color: #fff; border-color: transparent; }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .spacer { flex: 1; }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+  #results.show { display: block; }
+  .results-hero { background: var(--c-accent); color: #fff; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
+  .results-hero-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin-bottom: 0.5rem; }
+  .results-hero-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; margin-bottom: 0.5rem; }
+  .results-hero-sub { font-size: 13px; opacity: 0.7; line-height: 1.5; }
+
+  .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .r-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 1rem; }
+  .r-card-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-faint); margin-bottom: 4px; }
+  .r-card-value { font-size: 13px; font-weight: 500; color: var(--c-text); line-height: 1.4; }
+
+  .persona-panel { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; }
+  .persona-top { display: flex; align-items: center; gap: 14px; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--c-border); }
+  .persona-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--c-accent-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .persona-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; }
+  .persona-role { font-size: 12px; color: var(--c-text-muted); }
+  .persona-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .persona-table tr td { padding: 6px 0; vertical-align: top; }
+  .persona-table tr td:first-child { color: var(--c-text-muted); width: 130px; }
+  .persona-table tr + tr td { border-top: 1px solid var(--c-border); }
+
+  .recs-panel { background: var(--c-success-bg); border: 1px solid rgba(45,106,79,0.2); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; }
+  .recs-title { font-size: 12px; font-weight: 500; color: var(--c-success); margin-bottom: 10px; letter-spacing: 0.02em; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; padding: 3px 10px; border-radius: 99px; border: 1px solid rgba(45,106,79,0.25); color: var(--c-success); background: #fff; }
+
+  .context-block { background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: var(--c-text-muted); line-height: 1.6; }
+  .context-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-text-faint); margin-bottom: 6px; }
+
+  .results-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--c-border); margin-top: 4rem; padding: 2rem; text-align: center; font-size: 12px; color: var(--c-text-faint); }
+  footer strong { color: var(--c-text-muted); font-weight: 500; }
+
+  /* ── DIVIDER ── */
+  .section-divider { border: none; border-top: 1px solid var(--c-border); margin: 3rem auto; max-width: 780px; padding: 0 2rem; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-left { animation: fadeUp 0.6s ease both; }
+  .hero-aside .stat-card { animation: fadeUp 0.5s ease both; }
+
+  /* ── PRINT ── */
+  @media print {
+    nav, .hero-aside, .method-grid, #questionnaire > .q-footer .btn:first-child { display: none; }
+    #results.show { display: block !important; }
+    body { background: white; }
   }
 
-  .tool-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 32px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-  }
-
-  .tool-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--accent);
-  }
-
-  .tool-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-  }
-
-  .tool-card.wire::before { background: var(--accent); }
-  .tool-card.proto::before { background: var(--accent2); }
-  .tool-card.card::before { background: var(--step3); }
-  .tool-card.ux::before { background: var(--accent3); }
-  .tool-card.cms::before { background: var(--step5); }
-
-  .tool-num {
-    position: absolute;
-    top: 28px;
-    right: 28px;
-    font-size: 48px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    color: var(--border);
-    line-height: 1;
-  }
-
-  .tool-card h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .tool-card.wire h3 { color: var(--accent); }
-  .tool-card.proto h3 { color: var(--accent2); }
-  .tool-card.card h3 { color: var(--step3); }
-  .tool-card.ux h3 { color: var(--accent3); }
-  .tool-card.cms h3 { color: var(--step5); }
-
-  .tool-why {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 20px;
-    line-height: 1.7;
-  }
-
-  .tool-items {
-    list-style: none;
-    margin-bottom: 20px;
-  }
-
-  .tool-items li {
-    font-size: 12px;
-    color: var(--text);
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .tool-items li::before {
-    content: '→';
-    color: var(--muted);
-    font-size: 11px;
-  }
-
-  .tool-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 16px;
-  }
-
-  .badge {
-    padding: 4px 10px;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    border-radius: 1px;
-  }
-
-  .tool-card.wire .badge { background: rgba(200,240,77,0.12); color: var(--accent); }
-  .tool-card.proto .badge { background: rgba(77,255,195,0.12); color: var(--accent2); }
-  .tool-card.card .badge { background: rgba(167,139,250,0.12); color: var(--step3); }
-  .tool-card.ux .badge { background: rgba(255,107,74,0.12); color: var(--accent3); }
-  .tool-card.cms .badge { background: rgba(244,114,182,0.12); color: var(--step5); }
-
-  /* METHODOLOGY / STEPS */
-  .steps-container {
-    position: relative;
-  }
-
-  .steps-container::before {
-    content: '';
-    position: absolute;
-    left: 24px;
-    top: 60px;
-    bottom: 60px;
-    width: 1px;
-    background: linear-gradient(to bottom, var(--step1), var(--step2), var(--step3), var(--step4), var(--step5), var(--step6));
-  }
-
-  .step {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 8px;
-    align-items: flex-start;
-  }
-
-  .step-marker {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    border: 2px solid;
-    background: var(--bg);
-    position: relative;
-    z-index: 1;
-  }
-
-  .step:nth-child(1) .step-marker { color: var(--step1); border-color: var(--step1); }
-  .step:nth-child(2) .step-marker { color: var(--step2); border-color: var(--step2); }
-  .step:nth-child(3) .step-marker { color: var(--step3); border-color: var(--step3); }
-  .step:nth-child(4) .step-marker { color: var(--step4); border-color: var(--step4); }
-  .step:nth-child(5) .step-marker { color: var(--step5); border-color: var(--step5); }
-  .step:nth-child(6) .step-marker { color: var(--step6); border-color: var(--step6); }
-
-  .step-content {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 28px 32px;
-    margin-bottom: 16px;
-  }
-
-  .step-content h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  .step:nth-child(1) .step-content h3 { color: var(--step1); }
-  .step:nth-child(2) .step-content h3 { color: var(--step2); }
-  .step:nth-child(3) .step-content h3 { color: var(--step3); }
-  .step:nth-child(4) .step-content h3 { color: var(--step4); }
-  .step:nth-child(5) .step-content h3 { color: var(--step5); }
-  .step:nth-child(6) .step-content h3 { color: var(--step6); }
-
-  .step-content p {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    line-height: 1.7;
-  }
-
-  .step-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .pill {
-    padding: 4px 12px;
-    border: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--muted);
-    border-radius: 100px;
-  }
-
-  /* CARD SORTING DEMO */
-  .cards-demo {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 40px;
-    margin-top: 32px;
-  }
-
-  .cards-demo h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
-
-  .cards-pool {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 32px;
-  }
-
-  .sort-card {
-    padding: 10px 18px;
-    background: var(--bg);
-    border: 1px solid var(--step3);
-    color: var(--text);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-    border-radius: 2px;
-  }
-
-  .sort-card:hover {
-    background: rgba(167,139,250,0.15);
-    transform: translateY(-2px);
-  }
-
-  /* STRUCTURE TREE */
-  .tree {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 32px;
-    font-size: 13px;
-  }
-
-  .tree ul { list-style: none; padding-left: 24px; }
-
-  .tree > ul { padding-left: 0; }
-
-  .tree li {
-    padding: 6px 0;
-    position: relative;
-    color: var(--text);
-  }
-
-  .tree li::before {
-    content: '';
-    position: absolute;
-    left: -18px;
-    top: 50%;
-    width: 12px;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .tree > ul > li::before { display: none; }
-
-  .tree li > span {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 10px;
-    border-radius: 2px;
-    transition: background 0.15s;
-    cursor: default;
-  }
-
-  .tree li > span:hover { background: var(--surface2); }
-
-  .tree-root > span { color: var(--accent); font-weight: 500; }
-  .tree-branch > span { color: var(--accent2); }
-  .tree-leaf > span { color: var(--muted); font-size: 12px; }
-
-  /* CONCLUSION */
-  .conclusion {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 48px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .conclusion::after {
-    content: '"';
-    position: absolute;
-    right: 40px;
-    top: -20px;
-    font-size: 200px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    color: var(--border);
-    line-height: 1;
-  }
-
-  .conclusion p {
-    font-size: 16px;
-    line-height: 1.9;
-    color: var(--text);
-    max-width: 680px;
-  }
-
-  .conclusion p strong {
-    color: var(--accent);
-    font-style: normal;
-  }
-
-  /* FOOTER */
-  footer {
-    padding: 48px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* FADE-IN ANIMATION */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  @media (max-width: 768px) {
-    .hero, section, nav, footer { padding-left: 24px; padding-right: 24px; }
-    .hero { padding-top: 60px; padding-bottom: 80px; }
-    .steps-container::before { display: none; }
-    .step { flex-direction: column; gap: 12px; }
-    .step-marker { width: 36px; height: 36px; font-size: 14px; }
-    nav { overflow-x: auto; gap: 0; white-space: nowrap; }
-    nav a { margin-right: 20px; }
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .hero { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 1.25rem 2rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero-aside { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .method-grid { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: 1fr 1fr; }
+    .section { padding: 2rem 1.25rem; }
+    nav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+    .q-body { padding: 1.25rem; }
+    .q-footer { padding: 1rem 1.25rem; }
+    .q-header { padding: 1rem 1.25rem; }
   }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<header class="hero">
-  <div class="hero-label">Architecture de l'information — Méthodes & Recherche Utilisateur</div>
-  <h1>Analyse des<br><span>Besoins</span><br>Utilisateurs</h1>
-  <p class="hero-desc">
-    Un guide méthodologique complet pour comprendre les utilisateurs, organiser l'information et construire des expériences centrées sur leurs besoins réels.
-  </p>
-  <div class="hero-tags">
-    <span class="tag">Wireframing</span>
-    <span class="tag">Prototypage</span>
-    <span class="tag">Card Sorting</span>
-    <span class="tag">Analyse UX</span>
-    <span class="tag">CMS</span>
-    <span class="tag">Tests utilisateurs</span>
-  </div>
-  <div class="scroll-hint">Défiler</div>
-</header>
-
 <!-- NAV -->
-<nav id="main-nav">
-  <a href="#objectifs">Objectifs</a>
-  <a href="#outils">Outils</a>
-  <a href="#methode">Méthodologie</a>
-  <a href="#structure">Structure</a>
-  <a href="#conclusion">Conclusion</a>
+<nav>
+  <a class="nav-brand" href="#">Analyse <span>des besoins</span></a>
+  <ul class="nav-links">
+    <li><a href="#methode">Méthode</a></li>
+    <li><a href="#questionnaire-section">Questionnaire</a></li>
+  </ul>
+  <span class="nav-badge">Architecture de l'information</span>
 </nav>
 
-<!-- OBJECTIFS -->
-<section id="objectifs">
-  <div class="section-num">01</div>
-  <h2>Les 4 Objectifs<br>du Projet</h2>
-  <div class="goals-grid fade-in">
-    <div class="goal-item">
-      <span class="goal-icon">👥</span>
-      <h3>Comprendre</h3>
-      <p>Identifier qui sont les utilisateurs, leurs contextes, habitudes et comportements réels.</p>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Cours — Architecture de l'information</div>
+    <h1>Comprendre vos <em>utilisateurs</em></h1>
+    <p class="hero-desc">Un questionnaire structuré pour identifier les besoins, comportements et attentes de vos utilisateurs. Obtenez une synthèse exploitable pour guider vos décisions de conception.</p>
+    <a class="hero-cta" href="#questionnaire-section" onclick="document.getElementById('questionnaire-section').scrollIntoView({behavior:'smooth'}); return false;">
+      Commencer l'analyse
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3l5 5-5 5M3 8h10"/></svg>
+    </a>
+  </div>
+  <aside class="hero-aside">
+    <div class="stat-card">
+      <div class="stat-card-num">7</div>
+      <div class="stat-card-label">questions structurées</div>
     </div>
-    <div class="goal-item">
-      <span class="goal-icon">🔍</span>
-      <h3>Identifier</h3>
-      <p>Découvrir les besoins explicites et implicites, les frustrations et les attentes non formulées.</p>
+    <div class="stat-card">
+      <div class="stat-card-num">4</div>
+      <div class="stat-card-label">sections thématiques</div>
     </div>
-    <div class="goal-item">
-      <span class="goal-icon">🗂️</span>
-      <h3>Organiser</h3>
-      <p>Structurer l'information selon la logique mentale des utilisateurs, pas celle des concepteurs.</p>
+    <div class="stat-card">
+      <div class="stat-card-num">1</div>
+      <div class="stat-card-label">persona généré</div>
     </div>
-    <div class="goal-item">
-      <span class="goal-icon">✨</span>
-      <h3>Améliorer</h3>
-      <p>Créer une expérience fluide, intuitive et satisfaisante à chaque point de contact.</p>
+  </aside>
+</section>
+
+<!-- METHODOLOGY -->
+<div id="methode">
+<hr class="section-divider">
+<section class="section">
+  <div class="hero-eyebrow">Approche méthodologique</div>
+  <h2 class="section-title">Pourquoi analyser les besoins ?</h2>
+  <p class="section-sub">L'analyse des besoins est la première étape d'une architecture de l'information réussie. Elle permet de concevoir pour les vrais utilisateurs, pas pour des hypothèses.</p>
+  <div class="method-grid">
+    <div class="method-card" data-num="1">
+      <div class="method-icon">👤</div>
+      <div class="method-title">Profilage utilisateur</div>
+      <div class="method-desc">Identifier qui sont les utilisateurs, leur niveau de compétence et leur contexte d'usage pour adapter l'interface.</div>
+    </div>
+    <div class="method-card" data-num="2">
+      <div class="method-icon">🎯</div>
+      <div class="method-title">Objectifs et tâches</div>
+      <div class="method-desc">Comprendre ce que l'utilisateur cherche à accomplir, à quelle fréquence et dans quelles conditions.</div>
+    </div>
+    <div class="method-card" data-num="3">
+      <div class="method-icon">💡</div>
+      <div class="method-title">Synthèse actionnable</div>
+      <div class="method-desc">Transformer les données collectées en recommandations concrètes pour la conception et la navigation.</div>
     </div>
   </div>
 </section>
+</div>
 
-<!-- OUTILS -->
-<section id="outils">
-  <div class="section-num">02</div>
-  <h2>Les 5 Outils<br>Essentiels</h2>
-  <div class="tools-grid">
+<!-- QUESTIONNAIRE -->
+<hr class="section-divider">
+<section class="section" id="questionnaire-section">
+  <div class="hero-eyebrow">Outil interactif</div>
+  <h2 class="section-title">Questionnaire d'analyse</h2>
+  <p class="section-sub">Répondez aux questions suivantes pour générer un profil utilisateur complet et des recommandations d'architecture.</p>
 
-    <div class="tool-card wire fade-in">
-      <div class="tool-num">01</div>
-      <h3>Wireframing</h3>
-      <p class="tool-why">Après l'analyse des besoins, proposez une structure d'interface adaptée. Le wireframe organise les contenus et visualise la navigation avant tout développement.</p>
-      <ul class="tool-items">
-        <li>Organiser les contenus</li>
-        <li>Montrer les fonctionnalités clés</li>
-        <li>Visualiser les flux de navigation</li>
-        <li>Créer maquettes de chaque page</li>
-      </ul>
-      <div class="tool-badges">
-        <span class="badge">Figma</span>
-        <span class="badge">Balsamiq</span>
-      </div>
+  <div id="questionnaire">
+    <div class="q-header">
+      <span class="q-section-label" id="q-section-label">Section 1 · Profil utilisateur</span>
+      <span class="q-step-indicator" id="q-step">1 / 7</span>
     </div>
+    <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="q-body">
 
-    <div class="tool-card proto fade-in">
-      <div class="tool-num">02</div>
-      <h3>Prototypage</h3>
-      <p class="tool-why">Le prototype simule le comportement réel. Les utilisateurs cliquent, testent les parcours et donnent des retours concrets sur l'architecture.</p>
-      <ul class="tool-items">
-        <li>Simuler la connexion utilisateur</li>
-        <li>Naviguer entre les pages</li>
-        <li>Tester la recherche d'info</li>
-        <li>Valider l'architecture d'info</li>
-      </ul>
-      <div class="tool-badges">
-        <span class="badge">Figma</span>
-        <span class="badge">Adobe XD</span>
-      </div>
-    </div>
-
-    <div class="tool-card card fade-in">
-      <div class="tool-num">03</div>
-      <h3>Card Sorting</h3>
-      <p class="tool-why">L'outil le plus important pour l'architecture de l'information. Il organise les contenus selon la logique mentale des utilisateurs, pas des concepteurs.</p>
-      <ul class="tool-items">
-        <li>Regrouper les contenus naturellement</li>
-        <li>Construire les menus principaux</li>
-        <li>Améliorer la navigation</li>
-        <li>Comprendre les modèles mentaux</li>
-      </ul>
-      <div class="tool-badges">
-        <span class="badge">Optimal Workshop</span>
-        <span class="badge">Miro</span>
-      </div>
-    </div>
-
-    <div class="tool-card ux fade-in">
-      <div class="tool-num">04</div>
-      <h3>Analyse UX</h3>
-      <p class="tool-why">Heatmaps et analytics permettent d'observer le comportement réel : zones cliquées, pages difficiles, problèmes de navigation identifiés.</p>
-      <ul class="tool-items">
-        <li>Observer les zones d'attention</li>
-        <li>Identifier les pages problèmes</li>
-        <li>Analyser les parcours réels</li>
-        <li>Mesurer l'engagement</li>
-      </ul>
-      <div class="tool-badges">
-        <span class="badge">Hotjar</span>
-        <span class="badge">Google Analytics</span>
-      </div>
-    </div>
-
-    <div class="tool-card cms fade-in">
-      <div class="tool-num">05</div>
-      <h3>CMS & Contenu</h3>
-      <p class="tool-why">L'architecture de l'information dépend de l'organisation du contenu. Définir catégories, sous-catégories et hiérarchie est fondamental.</p>
-      <ul class="tool-items">
-        <li>Définir les catégories</li>
-        <li>Créer les sous-catégories</li>
-        <li>Hiérarchiser les pages</li>
-        <li>Organiser la navigation principale</li>
-      </ul>
-      <div class="tool-badges">
-        <span class="badge">WordPress</span>
-        <span class="badge">Drupal</span>
-      </div>
-    </div>
-
-    <!-- Card Sorting Demo -->
-    <div class="tool-card card fade-in" style="grid-column: span 1;">
-      <div class="cards-demo">
-        <h3>Exemple — Cartes à trier</h3>
-        <div class="cards-pool">
-          <div class="sort-card">📚 Cours</div>
-          <div class="sort-card">📝 Notes</div>
-          <div class="sort-card">👤 Profil</div>
-          <div class="sort-card">📅 Emploi du temps</div>
-          <div class="sort-card">📖 Bibliothèque</div>
-          <div class="sort-card">💬 Messages</div>
-          <div class="sort-card">🎓 Examens</div>
-          <div class="sort-card">📊 Résultats</div>
-          <div class="sort-card">⚙️ Paramètres</div>
-          <div class="sort-card">🔔 Notifications</div>
+      <!-- Q1 -->
+      <div class="q-block active" data-q="0" data-type="radio">
+        <div class="q-title">Quel est le profil principal de l'utilisateur cible ?</div>
+        <div class="q-hint">Choisissez le profil qui correspond le mieux à votre audience principale.</div>
+        <div class="options">
+          <button class="opt-btn" data-value="Étudiant / Chercheur"><span class="opt-radio"></span><span><span class="opt-label">Étudiant / Chercheur</span><span class="opt-desc">Contexte académique, apprentissage ou recherche universitaire</span></span></button>
+          <button class="opt-btn" data-value="Professionnel / Expert"><span class="opt-radio"></span><span><span class="opt-label">Professionnel / Expert</span><span class="opt-desc">Usage métier, efficacité et productivité au premier plan</span></span></button>
+          <button class="opt-btn" data-value="Grand public / Novice"><span class="opt-radio"></span><span><span class="opt-label">Grand public / Novice</span><span class="opt-desc">Peu familier avec le domaine, accompagnement nécessaire</span></span></button>
+          <button class="opt-btn" data-value="Audience mixte"><span class="opt-radio"></span><span><span class="opt-label">Audience mixte</span><span class="opt-desc">Plusieurs types d'utilisateurs coexistent sur le même site</span></span></button>
         </div>
-        <p style="font-size:11px; color:var(--muted);">→ Question posée aux utilisateurs : « Comment regrouperiez-vous ces éléments ? »</p>
       </div>
-    </div>
 
+      <!-- Q2 -->
+      <div class="q-block" data-q="1" data-type="radio">
+        <div class="q-title">Quel est le niveau de maîtrise numérique de vos utilisateurs ?</div>
+        <div class="q-hint">Le niveau influence directement la complexité acceptable de l'interface.</div>
+        <div class="options">
+          <button class="opt-btn" data-value="Débutant — peu à l'aise avec les outils numériques"><span class="opt-radio"></span><span><span class="opt-label">Débutant</span><span class="opt-desc">Peu à l'aise avec la technologie, besoin de guidage et labels clairs</span></span></button>
+          <button class="opt-btn" data-value="Intermédiaire — usage courant du web et des applications"><span class="opt-radio"></span><span><span class="opt-label">Intermédiaire</span><span class="opt-desc">Usage courant du web et des applications mobiles</span></span></button>
+          <button class="opt-btn" data-value="Avancé — utilisateur expert ou profil technique"><span class="opt-radio"></span><span><span class="opt-label">Avancé</span><span class="opt-desc">Profil technique, à l'aise avec des interfaces complexes</span></span></button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="q-block" data-q="2" data-type="radio">
+        <div class="q-title">Quel est l'objectif principal de l'utilisateur sur ce site ?</div>
+        <div class="q-hint">Qu'est-ce que l'utilisateur cherche à accomplir en priorité ?</div>
+        <div class="options">
+          <button class="opt-btn" data-value="Trouver une information précise"><span class="opt-radio"></span><span><span class="opt-label">Trouver une information précise</span><span class="opt-desc">Recherche ciblée, consultation de contenu spécifique</span></span></button>
+          <button class="opt-btn" data-value="Explorer et naviguer librement"><span class="opt-radio"></span><span><span class="opt-label">Explorer / naviguer librement</span><span class="opt-desc">Découverte, curiosité, navigation sans intention fixe</span></span></button>
+          <button class="opt-btn" data-value="Accomplir une tâche précise (formulaire, achat, inscription)"><span class="opt-radio"></span><span><span class="opt-label">Accomplir une tâche précise</span><span class="opt-desc">Remplir un formulaire, acheter, s'inscrire, télécharger…</span></span></button>
+          <button class="opt-btn" data-value="Apprendre et se former"><span class="opt-radio"></span><span><span class="opt-label">Apprendre / se former</span><span class="opt-desc">Acquisition de connaissances, consultation de tutoriels</span></span></button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="q-block" data-q="3" data-type="radio">
+        <div class="q-title">À quelle fréquence l'utilisateur visitera-t-il le site ?</div>
+        <div class="q-hint">La fréquence d'usage influence la courbe d'apprentissage acceptable.</div>
+        <div class="options">
+          <button class="opt-btn" data-value="Visite unique ou ponctuelle"><span class="opt-radio"></span><span><span class="opt-label">Visite unique / ponctuelle</span><span class="opt-desc">L'utilisateur vient une seule fois, sans retour prévu</span></span></button>
+          <button class="opt-btn" data-value="Occasionnelle — quelques fois par mois"><span class="opt-radio"></span><span><span class="opt-label">Occasionnelle</span><span class="opt-desc">Quelques fois par mois, usage non régulier</span></span></button>
+          <button class="opt-btn" data-value="Régulière — plusieurs fois par semaine"><span class="opt-radio"></span><span><span class="opt-label">Régulière</span><span class="opt-desc">Plusieurs fois par semaine, fidélisation possible</span></span></button>
+          <button class="opt-btn" data-value="Quotidienne et intensive"><span class="opt-radio"></span><span><span class="opt-label">Quotidienne / intensive</span><span class="opt-desc">Usage journalier, outil intégré au quotidien</span></span></button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="q-block" data-q="4" data-type="radio">
+        <div class="q-title">Sur quel appareil l'utilisateur accèdera-t-il principalement ?</div>
+        <div class="q-hint">Le support d'accès conditionne les contraintes d'ergonomie et de design.</div>
+        <div class="options">
+          <button class="opt-btn" data-value="Ordinateur de bureau ou laptop"><span class="opt-radio"></span><span><span class="opt-label">Ordinateur de bureau / laptop</span><span class="opt-desc">Grand écran, clavier, souris — contexte sédentaire</span></span></button>
+          <button class="opt-btn" data-value="Smartphone"><span class="opt-radio"></span><span><span class="opt-label">Smartphone</span><span class="opt-desc">Petit écran tactile, usage souvent en mobilité</span></span></button>
+          <button class="opt-btn" data-value="Tablette"><span class="opt-radio"></span><span><span class="opt-label">Tablette</span><span class="opt-desc">Taille intermédiaire, usage tactile et mixte</span></span></button>
+          <button class="opt-btn" data-value="Multi-appareils — tous supports"><span class="opt-radio"></span><span><span class="opt-label">Multi-appareils</span><span class="opt-desc">Tous supports confondus, design responsive impératif</span></span></button>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="q-block" data-q="5" data-type="radio">
+        <div class="q-title">Quel est le principal frein ou obstacle potentiel de l'utilisateur ?</div>
+        <div class="q-hint">Anticiper les obstacles permet de concevoir des solutions adaptées.</div>
+        <div class="options">
+          <button class="opt-btn" data-value="Manque de temps — besoin d'efficacité maximale"><span class="opt-radio"></span><span><span class="opt-label">Manque de temps</span><span class="opt-desc">Besoin d'efficacité maximale, pas de place pour la complexité</span></span></button>
+          <button class="opt-btn" data-value="Barrière technique — difficulté avec les outils numériques"><span class="opt-radio"></span><span><span class="opt-label">Barrière technique</span><span class="opt-desc">Difficulté avec les outils numériques, besoin d'accompagnement</span></span></button>
+          <button class="opt-btn" data-value="Manque de confiance — doutes sur la fiabilité du contenu"><span class="opt-radio"></span><span><span class="opt-label">Manque de confiance</span><span class="opt-desc">Doutes sur la fiabilité ou la sécurité du site</span></span></button>
+          <button class="opt-btn" data-value="Surcharge d'information — difficulté à trouver l'essentiel"><span class="opt-radio"></span><span><span class="opt-label">Surcharge d'information</span><span class="opt-desc">Trop de contenu, difficulté à prioriser l'essentiel</span></span></button>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="q-block" data-q="6" data-type="textarea">
+        <div class="q-title">Décrivez le contexte de votre projet</div>
+        <div class="q-hint">Nom du projet, public visé, fonctionnalité principale ou tout autre élément utile pour la synthèse.</div>
+        <textarea class="q-textarea" id="ta6" placeholder="Ex : Site de ressources pédagogiques pour étudiants en licence, permettant de consulter des fiches de révision et des exercices interactifs par matière…" rows="4"></textarea>
+      </div>
+
+    </div><!-- /q-body -->
+
+    <div class="q-footer" id="q-footer">
+      <button class="btn" id="btn-prev" onclick="prev()" style="visibility:hidden">← Retour</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="btn-next" onclick="nextOrSubmit()">Suivant →</button>
+    </div>
+  </div><!-- /questionnaire -->
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="results-hero">
+      <div class="results-hero-label">Synthèse générée</div>
+      <div class="results-hero-title">Profil utilisateur identifié</div>
+      <div class="results-hero-sub">Voici l'analyse des besoins dégagée à partir de vos réponses. Ces données peuvent être intégrées dans votre documentation d'architecture.</div>
+    </div>
+    <div class="results-grid" id="r-grid"></div>
+    <div class="persona-panel" id="r-persona"></div>
+    <div class="recs-panel" id="r-recs"></div>
+    <div id="r-context-block"></div>
+    <div class="results-actions">
+      <button class="btn" onclick="restart()">← Recommencer</button>
+      <button class="btn btn-primary" onclick="printResults()">Imprimer / Exporter</button>
+    </div>
   </div>
-</section>
 
-<!-- METHODOLOGIE -->
-<section id="methode">
-  <div class="section-num">03</div>
-  <h2>Méthodologie<br>Complète</h2>
-  <div class="steps-container fade-in">
-
-    <div class="step">
-      <div class="step-marker">1</div>
-      <div class="step-content">
-        <h3>Recherche Utilisateur</h3>
-        <p>Collecter des données qualitatives et quantitatives pour comprendre les utilisateurs dans leur contexte réel avant toute conception.</p>
-        <div class="step-pills">
-          <span class="pill">Questionnaires</span>
-          <span class="pill">Interviews</span>
-          <span class="pill">Observation</span>
-          <span class="pill">Personas</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-marker">2</div>
-      <div class="step-content">
-        <h3>Card Sorting</h3>
-        <p>Organiser les contenus selon la logique des utilisateurs. Résultats analysés pour construire une architecture cohérente avec leurs modèles mentaux.</p>
-        <div class="step-pills">
-          <span class="pill">Card sorting ouvert</span>
-          <span class="pill">Card sorting fermé</span>
-          <span class="pill">Analyse des clusters</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-marker">3</div>
-      <div class="step-content">
-        <h3>Architecture de l'Information</h3>
-        <p>Créer l'arborescence complète du site : catégories, sous-catégories et structure de navigation basées sur les résultats des étapes précédentes.</p>
-        <div class="step-pills">
-          <span class="pill">Arborescence</span>
-          <span class="pill">Taxinomie</span>
-          <span class="pill">Navigation</span>
-          <span class="pill">Métadonnées</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-marker">4</div>
-      <div class="step-content">
-        <h3>Wireframe</h3>
-        <p>Créer les maquettes basse fidélité de chaque page. Valider la disposition des éléments, la hiérarchie visuelle et les flux de navigation.</p>
-        <div class="step-pills">
-          <span class="pill">Basse fidélité</span>
-          <span class="pill">Haute fidélité</span>
-          <span class="pill">Responsive</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-marker">5</div>
-      <div class="step-content">
-        <h3>Prototype Interactif</h3>
-        <p>Transformer les wireframes en prototype cliquable simulant le comportement réel. Permet de tester les parcours utilisateurs avant développement.</p>
-        <div class="step-pills">
-          <span class="pill">Interactions</span>
-          <span class="pill">Transitions</span>
-          <span class="pill">Parcours complets</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-marker">6</div>
-      <div class="step-content">
-        <h3>Tests UX & Itération</h3>
-        <p>Tester avec des utilisateurs réels. Analyser les heatmaps, les enregistrements de sessions et les analytics pour identifier les frictions restantes.</p>
-        <div class="step-pills">
-          <span class="pill">Heatmaps</span>
-          <span class="pill">A/B Testing</span>
-          <span class="pill">Analytics</span>
-          <span class="pill">Retours utilisateurs</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- STRUCTURE DU SITE -->
-<section id="structure">
-  <div class="section-num">04</div>
-  <h2>Exemple de Structure<br>Plateforme Universitaire</h2>
-  <div class="tree fade-in">
-    <ul>
-      <li class="tree-root"><span>🏠 Accueil</span>
-        <ul>
-          <li class="tree-branch"><span>📚 Cours</span>
-            <ul>
-              <li class="tree-leaf"><span>Modules</span></li>
-              <li class="tree-leaf"><span>Supports de cours</span></li>
-              <li class="tree-leaf"><span>Emploi du temps</span></li>
-            </ul>
-          </li>
-          <li class="tree-branch"><span>🎓 Examens</span>
-            <ul>
-              <li class="tree-leaf"><span>Calendrier des examens</span></li>
-              <li class="tree-leaf"><span>Sujets précédents</span></li>
-            </ul>
-          </li>
-          <li class="tree-branch"><span>📊 Notes</span>
-            <ul>
-              <li class="tree-leaf"><span>Relevé de notes</span></li>
-              <li class="tree-leaf"><span>Bulletins</span></li>
-            </ul>
-          </li>
-          <li class="tree-branch"><span>📖 Bibliothèque</span>
-            <ul>
-              <li class="tree-leaf"><span>Recherche de documents</span></li>
-              <li class="tree-leaf"><span>Ressources numériques</span></li>
-            </ul>
-          </li>
-          <li class="tree-branch"><span>👤 Profil Étudiant</span>
-            <ul>
-              <li class="tree-leaf"><span>Informations personnelles</span></li>
-              <li class="tree-leaf"><span>Messages</span></li>
-              <li class="tree-leaf"><span>Paramètres</span></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<!-- CONCLUSION -->
-<section id="conclusion">
-  <div class="section-num">05</div>
-  <h2>Conclusion</h2>
-  <div class="conclusion fade-in">
-    <p>
-      L'utilisation combinée des outils de <strong>wireframing</strong>, de <strong>prototypage</strong>, de <strong>card sorting</strong> et d'<strong>analyse UX</strong> permet de construire une architecture de l'information véritablement centrée sur les besoins utilisateurs.<br><br>
-      Ces méthodes améliorent l'<strong>organisation du contenu</strong>, la <strong>navigation</strong> et l'<strong>expérience utilisateur globale</strong> — transformant une interface complexe en un système intuitif que les utilisateurs adoptent naturellement.
-    </p>
-  </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <span>Architecture de l'Information — Méthodes & Recherche Utilisateur</span>
-  <span>Analyse des Besoins Utilisateurs © 2026</span>
+  Cours d'<strong>Architecture de l'information</strong> · Questionnaire d'analyse des besoins utilisateurs
 </footer>
 
 <script>
-  // Fade-in on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+const SECTIONS = ['Section 1 · Profil utilisateur','Section 1 · Profil utilisateur','Section 2 · Objectifs','Section 2 · Objectifs','Section 3 · Contexte','Section 3 · Contexte','Section 4 · Synthèse libre'];
+const LABELS = ['Profil','Niveau numérique','Objectif principal','Fréquence d\'usage','Appareil principal','Frein principal'];
+const answers = {};
+let current = 0;
+const total = 7;
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+function updateUI() {
+  document.getElementById('q-section-label').textContent = SECTIONS[current];
+  document.getElementById('q-step').textContent = (current+1) + ' / ' + total;
+  document.getElementById('progress').style.width = Math.round((current/total)*100) + '%';
+  document.getElementById('btn-prev').style.visibility = current > 0 ? 'visible' : 'hidden';
+  const isLast = current === total - 1;
+  document.getElementById('btn-next').textContent = isLast ? 'Voir la synthèse →' : 'Suivant →';
+}
 
-  // Active nav link on scroll
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('nav a');
-
-  const navObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        navLinks.forEach(l => l.classList.remove('active'));
-        const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
-    });
-  }, { threshold: 0.3 });
-
-  sections.forEach(s => navObserver.observe(s));
-
-  // Sort cards interaction (cosmetic)
-  document.querySelectorAll('.sort-card').forEach(card => {
-    card.addEventListener('click', function() {
-      this.style.opacity = this.style.opacity === '0.3' ? '1' : '0.3';
-    });
+document.querySelectorAll('.opt-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const block = this.closest('.q-block');
+    block.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    this.classList.add('selected');
+    answers[current] = this.dataset.value;
   });
+});
+
+function nextOrSubmit() {
+  const block = document.querySelector('.q-block[data-q="'+current+'"]');
+  if (block.dataset.type === 'radio' && !answers[current]) {
+    block.style.animation = 'none';
+    block.querySelectorAll('.opt-btn').forEach(b => { b.style.borderColor = '#f0a0a0'; setTimeout(()=>b.style.borderColor='',600); });
+    return;
+  }
+  if (current === total - 1) { showResults(); return; }
+  block.classList.remove('active');
+  current++;
+  document.querySelector('.q-block[data-q="'+current+'"]').classList.add('active');
+  updateUI();
+}
+
+function prev() {
+  if (current === 0) return;
+  document.querySelector('.q-block[data-q="'+current+'"]').classList.remove('active');
+  current--;
+  document.querySelector('.q-block[data-q="'+current+'"]').classList.add('active');
+  updateUI();
+}
+
+function showResults() {
+  answers[6] = document.getElementById('ta6').value.trim() || '—';
+  document.getElementById('questionnaire').style.display = 'none';
+  const r = document.getElementById('results');
+  r.classList.add('show');
+
+  // Cards
+  const grid = document.getElementById('r-grid');
+  grid.innerHTML = LABELS.map((lbl,i) => answers[i] ? '<div class="r-card"><div class="r-card-label">'+lbl+'</div><div class="r-card-value">'+answers[i]+'</div></div>' : '').join('');
+
+  // Persona
+  const icons = {'Étudiant / Chercheur':'🎓','Professionnel / Expert':'💼','Grand public / Novice':'👤','Audience mixte':'👥'};
+  const ico = icons[answers[0]] || '👤';
+  document.getElementById('r-persona').innerHTML =
+    '<div class="persona-top"><div class="persona-avatar">'+ico+'</div><div><div class="persona-name">Persona principal</div><div class="persona-role">'+(answers[0]||'—')+'</div></div></div>'+
+    '<table class="persona-table">'+
+    LABELS.slice(1).map((l,i)=>'<tr><td>'+l+'</td><td>'+(answers[i+1]||'—')+'</td></tr>').join('')+
+    '</table>';
+
+  // Recommendations
+  const tags = getRecs();
+  document.getElementById('r-recs').innerHTML = '<div class="recs-title">Recommandations architecturales</div><div class="tags">'+tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div>';
+
+  // Context
+  if (answers[6] && answers[6] !== '—') {
+    document.getElementById('r-context-block').innerHTML = '<div class="context-block"><div class="context-label">Contexte du projet</div>'+answers[6]+'</div>';
+  }
+
+  r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function getRecs() {
+  const t = [];
+  const a1 = answers[1]||'', a2 = answers[2]||'', a3 = answers[3]||'', a4 = answers[4]||'', a5 = answers[5]||'';
+  if (a1.includes('Débutant')) t.push('Navigation guidée','Labels explicites','Aide contextuelle','Zéro jargon');
+  if (a1.includes('Avancé')) t.push('Raccourcis clavier','Filtres avancés','Densité d\'information');
+  if (a2.includes('information')) t.push('Moteur de recherche','Taxonomie claire','Fil d\'Ariane');
+  if (a2.includes('tâche')) t.push('CTA visibles','Formulaires courts','Feedback instantané');
+  if (a2.includes('Explorer')) t.push('Navigation facettée','Contenu connexe','Cards exploratoires');
+  if (a2.includes('Apprendre')) t.push('Progression visible','Contenu structuré','Glossaire');
+  if (a3.includes('unique')) t.push('Onboarding immédiat','Zéro apprentissage');
+  if (a3.includes('Quotidienne')) t.push('Mémorisation d\'état','Personnalisation','Tableau de bord');
+  if (a4.includes('Smartphone')) t.push('Mobile-first','Zones tactiles ≥44px','Chargement rapide');
+  if (a4.includes('Multi')) t.push('Design responsive','Images adaptatives');
+  if (a5.includes('temps')) t.push('Scannabilité','Progressive disclosure','Résumés');
+  if (a5.includes('confiance')) t.push('Indicateurs de sécurité','Témoignages','Transparence');
+  if (a5.includes('Surcharge')) t.push('Hiérarchie visuelle','Chunking','Pagination');
+  if (a5.includes('technique')) t.push('Documentation intégrée','Tutoriels','FAQ');
+  if (t.length === 0) t.push('Navigation claire','Contenu structuré','Design accessible');
+  return [...new Set(t)].slice(0, 10);
+}
+
+function restart() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  current = 0;
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('ta6').value = '';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('questionnaire').style.display = '';
+  document.querySelectorAll('.q-block').forEach((b,i) => b.classList.toggle('active', i===0));
+  updateUI();
+  document.getElementById('questionnaire-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function printResults() { window.print(); }
+
+updateUI();
 </script>
 </body>
 </html>
